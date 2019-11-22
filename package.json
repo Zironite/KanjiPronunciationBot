@@ -3,18 +3,23 @@
   "version": "1.0.0",
   "description": "",
   "main": "main.js",
+  "scripts": {
+    "start": "node main.js"
+  },
   "dependencies": {
     "kuroshiro": "^1.1.2",
     "kuroshiro-analyzer-kuromoji": "^1.1.0",
-    "telegraf": "^3.33.3"
+    "telegraf": "^3.33.3",
+    "express": "^4.16.4",
+    "node-server-screenshot": "^0.2.3"
   },
   "devDependencies": {},
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Zironite/KanjiPronunciationBot.git"
+  },
+  "engines": {
+    "node": "8.x"
   },
   "author": "",
   "license": "ISC",
