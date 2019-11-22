@@ -37,8 +37,7 @@ kuroshiro.init(new KuromojiAnalyzer()).then(() => {
                 .then(result =>{
                   kuroshiro.convert(result.data.text, { to: "hiragana", mode: "okurigana" })
                     .then(actualResult => ctx.reply(actualResult));
-                })
-                .finally(resultOrError => console.log(resultOrError));
+                });
             }
           });
         });
