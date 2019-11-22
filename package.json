@@ -20,7 +20,7 @@
     "url": "git+https://github.com/Zironite/KanjiPronunciationBot.git"
   },
   "engines": {
-    "node": "8.x"
+    "node": "10.x"
   },
   "author": "",
   "license": "ISC",
