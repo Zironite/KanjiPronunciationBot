@@ -5,6 +5,7 @@ const Kuroshiro = require("kuroshiro");
 const KuromojiAnalyzer = require("kuroshiro-analyzer-kuromoji");
 const tesseract = require("tesseract.js");
 const request = require("request");
+const sharp = require('sharp');
 
 const keyboard = Markup.inlineKeyboard([
     Markup.urlButton('❤️', 'http://telegraf.js.org'),
@@ -31,14 +32,21 @@ kuroshiro.init(new KuromojiAnalyzer()).then(() => {
             if (error) {
               console.error(error);
             } else {
-              let job = tesseract.recognize(body, "jpn", { logger: m => console.log(m) });
-              job
-                .catch(err => console.error(err))
-                .then(result =>{
-                  kuroshiro.convert(result.data.text, { to: "hiragana", mode: "okurigana" })
-                    .then(actualResult => ctx.reply(actualResult));
+              sharp(body)
+                .resize(600,600, {
+                  fit: 'contain'
                 })
-                .finally(resultOrError => console.log(resultOrError));
+                .toBuffer()
+                .then(data => {
+                  let job = tesseract.recognize(data, "jpn", { logger: m => console.log(m) });
+                  job
+                    .catch(err => console.error(err))
+                    .then(result =>{
+                      kuroshiro.convert(result.data.text, { to: "hiragana", mode: "okurigana" })
+                        .then(actualResult => ctx.reply(actualResult));
+                    })
+                    .finally(resultOrError => console.log(resultOrError));
+                });
             }
           });
         });
