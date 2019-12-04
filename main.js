@@ -15,34 +15,40 @@ kuroshiro.init(kuromojiAnalyzer).then(() => {
   }).build((err, tokenizer) => {
     const bot = new Telegraf(process.env.BOT_TOKEN);
 
+    bot.command('jisho', (ctx) => {
+      let translationPromises = [];
+      let parsedKanji = {};
+      tokenizer.tokenize(ctx.message.text).filter(element => Kuroshiro.Util.hasKanji(element.basic_form))
+        .map(element => {
+          for (let i = 0; i < element.basic_form.length; i++) {
+            let currChar = element.basic_form.charAt(i);
+
+            if (Kuroshiro.Util.hasKanji(currChar) && !parsedKanji.hasOwnProperty(currChar)) {
+              parsedKanji[currChar] = true;
+              translationPromises.push(jisho.searchForKanji(currChar).then((currKanjiResult) => {
+                return {
+                  kanji: currChar,
+                  meaning: currKanjiResult.meaning
+                };
+              }));
+            }
+          }
+        });
+      Promise.all(translationPromises).then(values => {
+        let translationText = values.map(value => {
+          return `${value.kanji} => ${value.meaning}`
+        }).join("\n");
+        if (translationText !== "")
+          ctx.reply(translationText);
+        else
+          ctx.reply("Please input text to translate")
+      });
+    });
     bot.on('message', (ctx) => {
       if(ctx.message.text) {
         const result = kuroshiro.convert(ctx.message.text, { to: "hiragana", mode: "okurigana" });
         result.then((actualResult) => {
-          let translationPromises = [];
-          let parsedKanji = {};
-          tokenizer.tokenize(ctx.message.text).filter(element => Kuroshiro.Util.hasKanji(element.basic_form))
-            .map(element => {
-              for (let i = 0; i < element.basic_form.length; i++) {
-                let currChar = element.basic_form.charAt(i);
-
-                if (Kuroshiro.Util.hasKanji(currChar) && !parsedKanji.hasOwnProperty(currChar)) {
-                  parsedKanji[currChar] = true;
-                  translationPromises.push(jisho.searchForKanji(currChar).then((currKanjiResult) => {
-                    return {
-                      kanji: currChar,
-                      meaning: currKanjiResult.meaning
-                    };
-                  }));
-                }
-              }
-            });
-          Promise.all(translationPromises).then(values => {
-            let translationText = values.map(value => {
-              return `${value.kanji} => ${value.meaning}`
-            }).join("\n");
-            ctx.reply(`${actualResult}\n\n${translationText}`);
-          });
+          ctx.reply(actualResult);
         });
       }
     });
