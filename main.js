@@ -11,34 +11,30 @@ const kuroshiro = new Kuroshiro();
 const kuromojiAnalyzer = new KuromojiAnalyzer();
 const jisho = new JishoApi();
 kuroshiro.init(kuromojiAnalyzer).then(() => {
-  kuromoji.builder({
-    dicPath: "./node_modules/kuromoji/dict/"
-  }).build((err, tokenizer) => {
-    const bot = new Telegraf(process.env.BOT_TOKEN);
-
-    bot.use(session())
-    bot.command('jisho', (ctx) => {
-      if (ctx.message.text === "/jisho") {
-        ctx.reply("What word would you like to learn about?");
-        ctx.session.use_jisho = true;
-      } else {
-        jishoTranslation(ctx, tokenizer);
-      }
-    });
-    bot.on('message', (ctx) => {
-      if(ctx.message.text) {
-        if (ctx.session.use_jisho) {
-          jishoTranslation(ctx, tokenizer);
-        } else {
-          const result = kuroshiro.convert(ctx.message.text, { to: "hiragana", mode: "okurigana" });
-          result.then((actualResult) => {
-            ctx.reply(actualResult);
-          });
-        }
-      }
-    });
-    bot.launch();
+  const bot = new Telegraf(process.env.BOT_TOKEN);
+  tokenizer = kuromojiAnalyzer._analyzer;
+  bot.use(session())
+  bot.command('jisho', (ctx) => {
+    if (ctx.message.text === "/jisho") {
+      ctx.reply("What word would you like to learn about?");
+      ctx.session.use_jisho = true;
+    } else {
+      jishoTranslation(ctx, tokenizer);
+    }
   });
+  bot.on('message', (ctx) => {
+    if(ctx.message.text) {
+      if (ctx.session.use_jisho) {
+        jishoTranslation(ctx, tokenizer);
+      } else {
+        const result = kuroshiro.convert(ctx.message.text, { to: "hiragana", mode: "okurigana" });
+        result.then((actualResult) => {
+          ctx.reply(actualResult);
+        });
+      }
+    }
+  });
+  bot.launch();
 });
 
 const express = require("express");
