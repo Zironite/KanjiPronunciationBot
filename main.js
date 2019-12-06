@@ -1,9 +1,6 @@
 const Telegraf = require('telegraf');
-const Extra = require('telegraf/extra');
-const Markup = require('telegraf/markup');
 const Kuroshiro = require("kuroshiro");
 const KuromojiAnalyzer = require("kuroshiro-analyzer-kuromoji");
-const kuromoji = require("kuromoji")
 const JishoApi = require("unofficial-jisho-api");
 const session = require('telegraf/session');
 
